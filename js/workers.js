@@ -87,3 +87,52 @@ class InlineWorker extends WebWorker {
         ], { type: 'application/javascript' } ) );
     }
 }
+
+// SubscribableWorker creates a WebWorker that once done will send the result to multiple listeners
+class SubscribableWorker extends WebWorker {
+    constructor(path, name) {
+        super(() => new Worker(path, {type: 'module', name}))
+
+        this._listeners = new Map()
+    }
+
+    start(post) {
+        if (this.isActive) throw "Worker is already active"
+
+        this._newWorker(data => {
+            this._listeners.forEach(call => call(data));
+        }).postMessage(post);
+    }
+
+    get listeners() {
+        return this._listeners.size()
+    }
+
+    listen(listenerID, then) {
+        this._listeners.set(listenerID, then)
+
+        return this
+    }
+
+    remove(listenerID, teminateIfEmpty) {
+        const size = this.listeners
+        
+        if (size === 0)
+            throw "No listeners to remove"
+
+        if (!this._listeners.delete(listenerID))
+            throw "Cannot find selected listener"
+
+        if (size === 1 && teminateIfEmpty)
+            this.stop()
+
+        return this
+    }
+}
+
+// SingletonWorker creates a WebWorker that will always use the same given Worker
+class SingletonWorker extends WebWorker {
+    constructor(worker) {
+        super(() => worker)
+    }
+}

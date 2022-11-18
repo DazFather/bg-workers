@@ -10,7 +10,7 @@ const worker = new InlineWorker(data => {
         if (n === 0 || n === 1)
             return 1
 
-        return value = n * factorial(n - 1)
+        return n * factorial(n - 1)
     }
 
     postMessage(factorial(data))

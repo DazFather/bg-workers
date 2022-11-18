@@ -1,16 +1,16 @@
 # Background Workers
 Taking some complexity away from web workers API while enhanced them a bit
 
-## Features
- - creates a worke on the fly without the need of a dedicated file
+
+## Features and overview
+ - creates a worke on the fly without the need of a dedicated file unsing `InlineWorker` class
  ```js
 const worker = new InlineWorker(data => {
     function factorial(n) {
         if (n === 0 || n === 1)
             return 1
 
-        const value = n * factorial(n - 1)
-        return value
+        return value = n * factorial(n - 1)
     }
 
     postMessage(factorial(data))
